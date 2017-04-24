@@ -29,6 +29,9 @@ public class HostConfig implements Serializable {
     @JsonProperty("Binds")
     private Binds binds;
 
+    @JsonProperty("Tmpfs")
+    private Tmpfs tmpfs;
+
     @JsonProperty("BlkioWeight")
     private Integer blkioWeight;
 
@@ -204,6 +207,10 @@ public class HostConfig implements Serializable {
     @JsonIgnore
     public Bind[] getBinds() {
         return (binds == null) ? new Bind[0] : binds.getBinds();
+    }
+
+    public Tmpfs getTmpfs() {
+        return tmpfs;
     }
 
     public Integer getBlkioWeight() {
@@ -448,12 +455,25 @@ public class HostConfig implements Serializable {
         this.links = new Links(links);
     }
 
+    @JsonIgnore
+    public void setTmpfsMounts(TmpfsMount[] tmpfsMounts) {
+        this.tmpfs = new Tmpfs(tmpfsMounts);
+    }
+
     // auto-generated builder setters
     /**
      * @see #binds
      */
     public HostConfig withBinds(Binds binds) {
         this.binds = binds;
+        return this;
+    }
+
+    /**
+     * @see #tmpfs
+     */
+    public HostConfig withTmpfsMounts(TmpfsMount[] tmpfsMounts) {
+        this.tmpfs = new Tmpfs(tmpfsMounts);
         return this;
     }
 
