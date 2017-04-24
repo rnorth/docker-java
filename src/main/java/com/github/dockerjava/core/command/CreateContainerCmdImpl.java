@@ -21,6 +21,8 @@ import com.github.dockerjava.api.model.LxcConf;
 import com.github.dockerjava.api.model.PortBinding;
 import com.github.dockerjava.api.model.Ports;
 import com.github.dockerjava.api.model.RestartPolicy;
+import com.github.dockerjava.api.model.Tmpfs;
+import com.github.dockerjava.api.model.TmpfsMount;
 import com.github.dockerjava.api.model.Ulimit;
 import com.github.dockerjava.api.model.Volume;
 import com.github.dockerjava.api.model.Volumes;
@@ -187,6 +189,12 @@ public class CreateContainerCmdImpl extends AbstrDockerCmd<CreateContainerCmd, C
     @JsonIgnore
     public Bind[] getBinds() {
         return hostConfig.getBinds();
+    }
+
+    @Override
+    @JsonIgnore
+    public Tmpfs getTmpfs() {
+        return hostConfig.getTmpfs();
     }
 
     @Override
@@ -527,6 +535,15 @@ public class CreateContainerCmdImpl extends AbstrDockerCmd<CreateContainerCmd, C
     public CreateContainerCmd withBinds(List<Bind> binds) {
         checkNotNull(binds, "binds was not specified");
         return withBinds(binds.toArray(new Bind[binds.size()]));
+    }
+
+
+
+    @Override
+    public CreateContainerCmd withTmpfsMounts(TmpfsMount... tmpfsMounts) {
+        checkNotNull(tmpfsMounts, "tmpfsMounts was not specified");
+        this.hostConfig.withTmpfsMounts(tmpfsMounts);
+        return this;
     }
 
     @Override

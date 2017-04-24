@@ -6,21 +6,9 @@ import com.github.dockerjava.api.command.CreateVolumeResponse;
 import com.github.dockerjava.api.command.InspectContainerResponse;
 import com.github.dockerjava.api.exception.ConflictException;
 import com.github.dockerjava.api.exception.DockerException;
-import com.github.dockerjava.api.model.Bind;
-import com.github.dockerjava.api.model.ContainerNetwork;
-import com.github.dockerjava.api.model.Device;
-import com.github.dockerjava.api.model.ExposedPort;
-import com.github.dockerjava.api.model.HostConfig;
-import com.github.dockerjava.api.model.Link;
-import com.github.dockerjava.api.model.LogConfig;
-import com.github.dockerjava.api.model.Network;
-import com.github.dockerjava.api.model.Ports;
+import com.github.dockerjava.api.model.*;
 import com.github.dockerjava.api.model.Ports.Binding;
 import com.github.dockerjava.core.RemoteApiVersion;
-import com.github.dockerjava.api.model.RestartPolicy;
-import com.github.dockerjava.api.model.Ulimit;
-import com.github.dockerjava.api.model.Volume;
-import com.github.dockerjava.api.model.VolumesFrom;
 import com.github.dockerjava.netty.AbstractNettyDockerClientTest;
 
 import org.apache.commons.io.FileUtils;
@@ -35,10 +23,7 @@ import org.testng.internal.junit.ArrayAsserts;
 
 import java.lang.reflect.Method;
 import java.security.SecureRandom;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 import static com.github.dockerjava.api.model.Capability.MKNOD;
 import static com.github.dockerjava.api.model.Capability.NET_ADMIN;
@@ -751,5 +736,23 @@ public class CreateContainerCmdExecTest extends AbstractNettyDockerClientTest {
         InspectContainerResponse inspectContainerResponse = dockerClient.inspectContainerCmd(container.getId()).exec();
 
         assertThat(inspectContainerResponse.getHostConfig().getPidsLimit(), is(hostConfig.getPidsLimit()));
+    }
+
+    @Test
+    public void createContainerWithTmpfs() throws DockerException {
+        HostConfig hostConfig = new HostConfig().withTmpfsMounts(new TmpfsMount[]{ new TmpfsMount("/var/run", "rw,nodev,nosuid,size=2G") });
+        CreateContainerResponse container = dockerClient.createContainerCmd(BUSYBOX_IMAGE)
+            .withHostConfig(hostConfig).withCmd("true").exec();
+
+        LOG.info("Created container {}", container.toString());
+
+        assertThat(container.getId(), not(isEmptyString()));
+
+        InspectContainerResponse inspectContainerResponse = dockerClient.inspectContainerCmd(container.getId()).exec();
+
+        final List<TmpfsMount> tmpfsConfig = inspectContainerResponse.getHostConfig().getTmpfs().getMounts();
+        assertThat(tmpfsConfig.size(), is(1));
+        assertThat(tmpfsConfig.get(0).getPath(), is("/var/run"));
+        assertThat(tmpfsConfig.get(0).getMountOptions(), is("rw,nodev,nosuid,size=2G"));
     }
 }

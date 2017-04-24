@@ -13,6 +13,8 @@ import com.github.dockerjava.api.model.LxcConf;
 import com.github.dockerjava.api.model.PortBinding;
 import com.github.dockerjava.api.model.Ports;
 import com.github.dockerjava.api.model.RestartPolicy;
+import com.github.dockerjava.api.model.Tmpfs;
+import com.github.dockerjava.api.model.TmpfsMount;
 import com.github.dockerjava.api.model.Ulimit;
 import com.github.dockerjava.api.model.Volume;
 import com.github.dockerjava.api.model.VolumesFrom;
@@ -28,6 +30,9 @@ public interface CreateContainerCmd extends SyncDockerCmd<CreateContainerRespons
 
     @CheckForNull
     Bind[] getBinds();
+
+    @CheckForNull
+    Tmpfs getTmpfs();
 
     /**
      * @since 1.19
@@ -218,6 +223,8 @@ public interface CreateContainerCmd extends SyncDockerCmd<CreateContainerRespons
     CreateContainerCmd withBinds(Bind... binds);
 
     CreateContainerCmd withBinds(List<Bind> binds);
+
+    CreateContainerCmd withTmpfsMounts(TmpfsMount... tmpfsMounts);
 
     /**
      * @since 1.19
